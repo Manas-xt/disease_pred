@@ -36,6 +36,63 @@
         linear-gradient(180deg, #f7f8f6 0%, #f1f3ef 100%);
     }
 
+    .page-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(247, 248, 246, 0.95);
+      backdrop-filter: blur(4px);
+      display: grid;
+      place-items: center;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .page-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .page-loader-card {
+      width: min(92vw, 360px);
+      text-align: center;
+      background: #ffffff;
+      border: 1px solid #d8ddd5;
+      border-radius: 14px;
+      padding: 22px 18px;
+      box-shadow: 0 14px 40px rgba(34, 45, 37, 0.12);
+    }
+    .page-loader-spinner {
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      border: 3px solid #d8dfd8;
+      border-top-color: #2f7a54;
+      animation: spin 0.72s linear infinite;
+    }
+    .page-loader-text {
+      color: #4f6356;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .page-loader-btn {
+      display: none;
+      margin-top: 12px;
+      border: 1px solid #cfd7cf;
+      border-radius: 999px;
+      background: #f4f8f4;
+      color: #335443;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .page-loader.slow .page-loader-btn {
+      display: inline-block;
+    }
+
     .orb { display: none; }
 
     nav {
@@ -712,6 +769,14 @@
 </head>
 <body>
 
+<div class="page-loader" id="pageLoader" role="status" aria-live="polite" aria-label="Loading page">
+  <div class="page-loader-card">
+    <div class="page-loader-spinner"></div>
+    <p class="page-loader-text" id="pageLoaderText">Loading MediPredict...</p>
+    <button type="button" class="page-loader-btn" id="pageLoaderBtn">Continue anyway</button>
+  </div>
+</div>
+
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 
@@ -825,6 +890,39 @@
 </div>
 
 <script>
+  // Full-page loader with slow-network fallback.
+  (function setupPageLoader() {
+    const loader = document.getElementById('pageLoader');
+    const text = document.getElementById('pageLoaderText');
+    const continueBtn = document.getElementById('pageLoaderBtn');
+
+    if (!loader || !text || !continueBtn) return;
+
+    let dismissed = false;
+
+    const hideLoader = () => {
+      if (dismissed) return;
+      dismissed = true;
+      loader.classList.add('hidden');
+    };
+
+    const slowTimer = window.setTimeout(() => {
+      if (dismissed) return;
+      loader.classList.add('slow');
+      text.textContent = 'This is taking longer than expected. You can keep waiting or continue.';
+    }, 7000);
+
+    window.addEventListener('load', () => {
+      window.clearTimeout(slowTimer);
+      window.setTimeout(hideLoader, 120);
+    });
+
+    continueBtn.addEventListener('click', () => {
+      window.clearTimeout(slowTimer);
+      hideLoader();
+    });
+  })();
+
   // All symptoms injected from Flask
   const ALL_SYMPTOMS = {{ symptoms | tojson }};
   let selected = new Set();
