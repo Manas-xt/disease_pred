@@ -621,9 +621,10 @@
   <a class="nav-item" href="#dataset">02 - Dataset</a>
   <a class="nav-item" href="#pipeline">03 - Pipeline</a>
   <a class="nav-item" href="#algorithms">04 - Algorithms</a>
-  <a class="nav-item" href="#code">05 - Code</a>
-  <a class="nav-item" href="#results">06 - Results</a>
-  <a class="nav-item" href="#conclusion">07 - Conclusion</a>
+  <a class="nav-item" href="#stack">05 - Libraries and Tools</a>
+  <a class="nav-item" href="#code">06 - Full ML Code</a>
+  <a class="nav-item" href="#results">07 - Results</a>
+  <a class="nav-item" href="#conclusion">08 - Conclusion</a>
   <a class="nav-item" href="/">Back to Predictor</a>
 </nav>
 
@@ -820,45 +821,94 @@
     </div>
   </section>
 
-  <section id="code">
+  <section id="stack">
     <div class="section-tag">05</div>
-    <h2>Training Code</h2>
-    <p>The complete training pipeline was implemented in Python and scikit-learn.</p>
+    <h2>Libraries, Algorithms and Tools Report</h2>
+    <p>
+      This section summarizes the exact stack used in your ML pipeline and deployment.
+      The details are generated from the backend so they stay synchronized with the project code.
+    </p>
+
+    <h3>Libraries and Frameworks</h3>
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Purpose in Project</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lib in libraries %}
+        <tr>
+          <td><strong>{{ lib.name }}</strong></td>
+          <td>{{ lib.type }}</td>
+          <td>{{ lib.purpose }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Algorithms Configured</h3>
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Algorithm</th>
+          <th>Configuration</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for algo in algorithms %}
+        <tr>
+          <td><strong>{{ algo.name }}</strong></td>
+          <td>{{ algo.details }}</td>
+          <td>{{ algo.use }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Project Tools</h3>
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tool</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tool in tools %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ tool }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section id="code">
+    <div class="section-tag">06</div>
+    <h2>Full ML Training Code</h2>
+    <p>
+      The complete code used for training, evaluation, visualization, and model export is shown below.
+      This is the same script content passed from the Flask backend.
+    </p>
 
     <div class="code-block">
       <div class="code-header">
         <div class="code-dot red"></div>
         <div class="code-dot yellow"></div>
         <div class="code-dot green"></div>
-        <span class="code-filename">training_pipeline.py</span>
+        <span class="code-filename">ml_training_full_script.py</span>
       </div>
-      <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
-<span class="kw">from</span> sklearn.naive_bayes <span class="kw">import</span> <span class="tp">GaussianNB</span>
-
-train_df = pd.<span class="fn">read_csv</span>(<span class="st">'Training.csv'</span>)
-X = train_df.<span class="fn">drop</span>(columns=[<span class="st">'prognosis'</span>])
-y = train_df[<span class="st">'prognosis'</span>]
-
-model = <span class="tp">GaussianNB</span>()
-model.<span class="fn">fit</span>(X, y)</pre>
-    </div>
-
-    <div class="code-block">
-      <div class="code-header">
-        <div class="code-dot red"></div>
-        <div class="code-dot yellow"></div>
-        <div class="code-dot green"></div>
-        <span class="code-filename">save_model.py</span>
-      </div>
-      <pre><span class="kw">import</span> joblib
-
-joblib.<span class="fn">dump</span>(model, <span class="st">'disease_model.pkl'</span>)
-joblib.<span class="fn">dump</span>(X.columns.<span class="fn">tolist</span>(), <span class="st">'symptom_cols.pkl'</span>)</pre>
+      <pre>{{ training_code | e }}</pre>
     </div>
   </section>
 
   <section id="results">
-    <div class="section-tag">06</div>
+    <div class="section-tag">07</div>
     <h2>Results and Evaluation</h2>
 
     <div class="result-highlight">
@@ -924,7 +974,7 @@ joblib.<span class="fn">dump</span>(X.columns.<span class="fn">tolist</span>(), 
   </section>
 
   <section id="conclusion">
-    <div class="section-tag">07</div>
+    <div class="section-tag">08</div>
     <h2>Conclusion</h2>
     <p>
       This project demonstrates a complete machine learning workflow from data preparation
