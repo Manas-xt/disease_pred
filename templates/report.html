@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ML Project Report - Disease Prediction System</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet"/>
   <style>
     :root {
       --ink: #1d2720;
@@ -23,6 +24,11 @@
       --code-yellow: #f9e2af;
       --code-pink: #f38ba8;
       --code-teal: #94e2d5;
+      --code-keyword: #ff7ab2;
+      --code-string: #9ecbff;
+      --code-number: #f9d78c;
+      --code-func: #82e4c6;
+      --code-comment: #7f8ca5;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -373,6 +379,55 @@
       font-size: 0.8rem;
       line-height: 1.7;
       color: var(--code-text);
+      margin: 0;
+      white-space: pre;
+    }
+    .code-block pre[class*="language-"] {
+      max-height: 70vh;
+      overflow: auto;
+      scrollbar-width: thin;
+    }
+    .code-block code[class*="language-"] {
+      font-family: 'Source Code Pro', monospace;
+      text-shadow: none;
+    }
+    .token.keyword { color: var(--code-keyword) !important; }
+    .token.string { color: var(--code-string) !important; }
+    .token.number { color: var(--code-number) !important; }
+    .token.function { color: var(--code-func) !important; }
+    .token.comment { color: var(--code-comment) !important; }
+
+    .mobile-toc {
+      display: none;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: #ffffff;
+      overflow-x: auto;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .mobile-toc a {
+      display: inline-block;
+      text-decoration: none;
+      margin-right: 8px;
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #cad3ca;
+      color: #35513f;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 700;
+      background: #f5faf5;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .kw { color: var(--code-pink); }
     .fn { color: var(--code-blue); }
@@ -533,6 +588,7 @@
     @media (max-width: 900px) {
       .sidebar { display: none; }
       .main { margin-left: 0; }
+      .mobile-toc { display: block; }
       section { padding: 40px 24px; }
       .cover { padding: 60px 24px; }
       .report-footer {
@@ -581,6 +637,10 @@
         padding: 30px 14px;
       }
 
+      .report-table {
+        min-width: 620px;
+      }
+
       .cover {
         padding: 44px 14px;
       }
@@ -606,6 +666,10 @@
         font-size: 0.74rem;
         padding: 16px;
       }
+
+      .code-block pre[class*="language-"] {
+        max-height: 58vh;
+      }
     }
   </style>
 </head>
@@ -627,6 +691,17 @@
   <a class="nav-item" href="#conclusion">08 - Conclusion</a>
   <a class="nav-item" href="/">Back to Predictor</a>
 </nav>
+
+<div class="mobile-toc">
+  <a href="#overview">Overview</a>
+  <a href="#dataset">Dataset</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#algorithms">Algorithms</a>
+  <a href="#stack">Libraries and Tools</a>
+  <a href="#code">Code</a>
+  <a href="#results">Results</a>
+  <a href="#conclusion">Conclusion</a>
+</div>
 
 <div class="main">
 
@@ -903,7 +978,7 @@
         <div class="code-dot green"></div>
         <span class="code-filename">ml_training_full_script.py</span>
       </div>
-      <pre>{{ training_code | e }}</pre>
+      <pre class="language-python"><code class="language-python">{{ training_code | e }}</code></pre>
     </div>
   </section>
 
@@ -1015,6 +1090,13 @@
 </div>
 
 <script>
+  document.querySelectorAll('.report-table').forEach((table) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'table-scroll';
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+
   const sections = document.querySelectorAll('section, .cover, .report-footer');
   const navItems = document.querySelectorAll('.nav-item[href^="#"]');
 
@@ -1031,5 +1113,8 @@
 
   document.querySelectorAll('[id]').forEach(el => observer.observe(el));
 </script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-clike.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
 </body>
 </html>
