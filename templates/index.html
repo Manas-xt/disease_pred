@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediPredict — Disease Prediction System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #f7f8f6;
+      --surface: #ffffff;
+      --surface-muted: #f1f3f0;
+      --border: #d8ddd5;
+      --text: #1d2720;
+      --muted: #607064;
+      --accent: #2f7a54;
+      --accent-soft: #e8f3ec;
+      --danger: #b2453d;
+      --shadow: 0 14px 36px rgba(34, 45, 37, 0.08);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 9px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      font-size: clamp(15px, 0.45vw + 13px, 17px);
+      background:
+        radial-gradient(circle at 10% 0%, #ffffff 0%, transparent 45%),
+        radial-gradient(circle at 100% 10%, #eef5ef 0%, transparent 38%),
+        linear-gradient(180deg, #f7f8f6 0%, #f1f3ef 100%);
+    }
+
+    .orb { display: none; }
+
+    nav {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 16px auto 0;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(30, 42, 34, 0.06);
+    }
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.2rem, 1vw + 1rem, 1.55rem);
+      letter-spacing: -0.01em;
+      color: #1f3227;
+    }
+    .logo span { color: var(--accent); }
+    .nav-badge {
+      font-size: 0.72rem;
+      color: #4f6356;
+      background: #f3f5f2;
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 999px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-link {
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #2f6d4d;
+      border: 1px solid #b9c9bc;
+      background: #edf5ef;
+      border-radius: 999px;
+      padding: 6px 11px;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .nav-link:hover {
+      background: #e2efe6;
+      border-color: #9eb5a4;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 20px 38px;
+      animation: reveal 0.7s ease both;
+    }
+    .hero-tag {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 6px 14px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #526659;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f9faf8;
+    }
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.9rem, 4.6vw, 3.45rem);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 12px;
+      color: #1b271f;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero p {
+      max-width: 630px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .main {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 56px;
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .symptom-panel,
+    .result-card,
+    .disclaimer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .symptom-panel { overflow: hidden; }
+    .panel-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .panel-header h2 {
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #33453a;
+    }
+    .selected-count {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid #cde2d5;
+      color: #2f6d4d;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .search-wrap {
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-wrap input {
+      width: 100%;
+      border: 1px solid #cfd6ce;
+      border-radius: var(--radius-sm);
+      padding: 11px 12px;
+      background: #fcfdfb;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .search-wrap input:focus {
+      border-color: #86b596;
+      box-shadow: 0 0 0 3px rgba(47, 122, 84, 0.13);
+    }
+    .search-wrap input::placeholder { color: #7f8d83; }
+
+    .symptom-grid {
+      padding: 16px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      max-height: 392px;
+      overflow-y: auto;
+    }
+    .symptom-grid::-webkit-scrollbar { width: 7px; }
+    .symptom-grid::-webkit-scrollbar-track { background: transparent; }
+    .symptom-grid::-webkit-scrollbar-thumb {
+      background: #d7ddd6;
+      border-radius: 999px;
+    }
+
+    .symptom-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid #d3d9d2;
+      background: #fbfcfa;
+      color: #526257;
+      font-size: 0.79rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .symptom-tag:hover {
+      border-color: #b5c6ba;
+      color: #2d4a3a;
+      background: #f3f7f3;
+    }
+    .symptom-tag.active {
+      border-color: #8ab79a;
+      background: var(--accent-soft);
+      color: #2f6f4f;
+    }
+    .symptom-tag .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .symptom-tag.active .dot { opacity: 1; }
+
+    .selected-strip {
+      min-height: 58px;
+      padding: 12px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      background: #fcfdfb;
+    }
+    .selected-strip .empty-msg {
+      color: #809084;
+      font-size: 0.82rem;
+    }
+    .sel-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid #c1d8ca;
+      background: #edf6f0;
+      color: #2f6d4e;
+      font-size: 0.77rem;
+      animation: popIn 0.2s ease;
+    }
+    .sel-chip button {
+      border: none;
+      background: transparent;
+      color: #2f6d4e;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.68;
+      transition: opacity 0.2s ease;
+    }
+    .sel-chip button:hover { opacity: 1; }
+
+    .action-row {
+      margin: 14px 22px 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .predict-btn {
+      width: 100%;
+      margin: 0;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      background: #2f7a54;
+      cursor: pointer;
+      transition: transform 0.14s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .predict-btn:hover {
+      background: #286a49;
+      transform: translateY(-1px);
+      box-shadow: 0 7px 18px rgba(47, 122, 84, 0.24);
+    }
+    .predict-btn:active { transform: translateY(0); }
+    .predict-btn:disabled {
+      background: #aeb9b0;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .reset-btn {
+      width: 100%;
+      margin: 0;
+      border: 1px solid #cfd7cf;
+      border-radius: var(--radius-sm);
+      padding: 11px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #3f5245;
+      background: #f7faf7;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .reset-btn:hover {
+      background: #eef4ee;
+      border-color: #b9c5ba;
+    }
+
+    .result-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .result-card { padding: 22px; }
+    .result-card h3 {
+      margin-bottom: 14px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: #5c6d62;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 0;
+    }
+    .empty-state .icon {
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      border: 1px solid #ced5cd;
+      background: #f5f8f4;
+      color: #7f8f84;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .empty-state p {
+      color: #67776c;
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .prediction-result { display: none; }
+    .prediction-result.show { display: block; animation: fadeUp 0.35s ease; }
+
+    .main-disease {
+      margin-bottom: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid #cbddcf;
+      background: linear-gradient(180deg, #f8fbf8 0%, #eef5ef 100%);
+      padding: 18px;
+      text-align: center;
+    }
+    .main-disease .label {
+      margin-bottom: 6px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5f7065;
+    }
+    .main-disease .disease-name {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.25rem, 1vw + 0.95rem, 1.65rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: #284e38;
+    }
+
+    .top3-title {
+      margin-bottom: 8px;
+      font-size: 0.73rem;
+      color: #6a7c71;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .top3-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 9px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e4e9e2;
+    }
+    .top3-item:last-child { border-bottom: none; }
+    .top3-item .rank {
+      width: 20px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #738478;
+    }
+    .top3-item .name {
+      flex: 1;
+      font-size: 0.86rem;
+      color: #2d3f34;
+    }
+    .top3-item .bar-wrap {
+      width: 84px;
+      height: 5px;
+      border-radius: 999px;
+      background: #dbe2da;
+      overflow: hidden;
+    }
+    .top3-item .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: #5ca279;
+      transition: width 0.65s ease;
+    }
+    .top3-item .pct {
+      width: 40px;
+      text-align: right;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #315e46;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-item {
+      text-align: center;
+      border: 1px solid #e0e6df;
+      background: #fafcf9;
+      border-radius: 11px;
+      padding: 14px;
+    }
+    .stat-item .val {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.2rem, 0.9vw + 1rem, 1.55rem);
+      font-weight: 700;
+      line-height: 1;
+      color: #284d38;
+    }
+    .stat-item .lbl {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #6f8074;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 26px 0;
+    }
+    .loading.show { display: block; }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      border: 3px solid #d8dfd8;
+      border-top-color: #5f9f7a;
+      animation: spin 0.72s linear infinite;
+    }
+    .loading p {
+      color: #6e7f74;
+      font-size: 0.86rem;
+    }
+
+    .error-msg {
+      display: none;
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #dfbeb9;
+      background: #fdf4f2;
+      color: var(--danger);
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+    .error-msg.show { display: block; }
+
+    .disclaimer {
+      padding: 14px 15px;
+      background: #f9fbf8;
+      font-size: 0.76rem;
+      line-height: 1.65;
+      color: #5e705f;
+    }
+    .disclaimer strong { color: #374f3f; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes popIn {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 960px) {
+      .main {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .hero {
+        padding-top: 52px;
+        padding-bottom: 30px;
+      }
+      .symptom-grid {
+        max-height: 340px;
+      }
+    }
+    @media (max-width: 768px) {
+      nav {
+        margin: 10px 14px 0;
+        padding: 13px 14px;
+      }
+      .nav-badge { display: none; }
+      .nav-link { font-size: 0.7rem; }
+      .hero { padding: 44px 18px 28px; }
+      .hero p {
+        font-size: 0.94rem;
+        line-height: 1.65;
+      }
+      .main {
+        padding: 0 14px 40px;
+        gap: 12px;
+      }
+      .result-panel {
+        gap: 12px;
+      }
+      .panel-header,
+      .search-wrap,
+      .symptom-grid,
+      .selected-strip,
+      .result-card {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .result-card {
+        padding-top: 18px;
+        padding-bottom: 18px;
+      }
+      .action-row {
+        margin-left: 16px;
+        margin-right: 16px;
+      }
+      .stats-grid {
+        gap: 8px;
+      }
+      .stat-item {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-top: 16px;
+        padding-bottom: 14px;
+      }
+      .selected-count {
+        font-size: 0.72rem;
+      }
+      .symptom-grid {
+        max-height: 300px;
+      }
+      .action-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .top3-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+          "rank name pct"
+          "rank bar bar";
+        align-items: center;
+        row-gap: 6px;
+        column-gap: 8px;
+      }
+      .top3-item .rank { grid-area: rank; }
+      .top3-item .name {
+        grid-area: name;
+        min-width: 0;
+      }
+      .top3-item .bar-wrap {
+        grid-area: bar;
+        width: 100%;
+      }
+      .top3-item .pct {
+        grid-area: pct;
+        justify-self: end;
+        width: auto;
+      }
+      .disclaimer {
+        font-size: 0.73rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      nav {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      .logo {
+        font-size: 1.05rem;
+      }
+      .hero {
+        padding: 36px 14px 24px;
+      }
+      .hero h1 {
+        line-height: 1.08;
+      }
+      .hero p {
+        font-size: 0.9rem;
+      }
+      .main {
+        padding: 0 10px 30px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .symptom-tag {
+        font-size: 0.74rem;
+        padding: 6px 10px;
+      }
+      .sel-chip {
+        max-width: 100%;
+      }
+      .predict-btn {
+        font-size: 0.9rem;
+      }
+      .reset-btn {
+        font-size: 0.86rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .panel-header,
+      .search-wrap,
+      .symptom-grid,
+      .selected-strip,
+      .result-card {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      .action-row {
+        margin-left: 12px;
+        margin-right: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Medi<span>Predict</span></div>
+  <div class="nav-actions">
+    <a href="/report" class="nav-link">ML Report</a>
+    <div class="nav-badge">Clinical Support</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Clinical decision support</div>
+  <h1>Predict Disease<br/>from <em>Symptoms</em></h1>
+  <p>Select your symptoms below and our machine learning model will predict the most likely disease.</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: Symptom Selector -->
+  <div class="symptom-panel">
+    <div class="panel-header">
+      <h2>Select Symptoms</h2>
+      <span class="selected-count" id="countBadge">0 selected</span>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search symptoms..." autocomplete="off"/>
+    </div>
+
+    <div class="symptom-grid" id="symptomGrid">
+      <!-- Injected by JS -->
+    </div>
+
+    <div class="selected-strip" id="selectedStrip">
+      <span class="empty-msg">No symptoms selected yet</span>
+    </div>
+
+    <div class="action-row">
+      <button class="reset-btn" onclick="resetSelection()">
+        Reset selection
+      </button>
+
+      <button class="predict-btn" id="predictBtn" disabled onclick="predict()">
+        Predict disease
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Results -->
+  <div class="result-panel">
+
+    <div class="result-card">
+      <h3>Diagnosis Result</h3>
+
+      <div class="empty-state" id="emptyState">
+        <div class="icon">Dx</div>
+        <p>Select at least <strong>2 symptoms</strong> and click Predict to see the diagnosis.</p>
+      </div>
+
+      <div class="loading" id="loadingState">
+        <div class="spinner"></div>
+        <p>Analyzing symptoms...</p>
+      </div>
+
+      <div class="error-msg" id="errorMsg">
+        Could not connect to server. Make sure Flask is running.
+      </div>
+
+      <div class="prediction-result" id="predictionResult">
+        <div class="main-disease">
+          <div class="label">Most Likely Disease</div>
+          <div class="disease-name" id="mainDisease">—</div>
+        </div>
+
+        <div class="top3-title">Top Predictions</div>
+        <div id="top3List"></div>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <h3>Session Stats</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="val" id="statSymptoms">0</div>
+          <div class="lbl">Symptoms Selected</div>
+        </div>
+        <div class="stat-item">
+          <div class="val" id="statPredictions">0</div>
+          <div class="lbl">Predictions Made</div>
+        </div>
+        <div class="stat-item">
+          <div class="val">41</div>
+          <div class="lbl">Diseases Covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="val">132</div>
+          <div class="lbl">Symptoms in Model</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This tool is for educational purposes only. It is not a substitute for professional medical advice. Always consult a qualified doctor for diagnosis.
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // All symptoms injected from Flask
+  const ALL_SYMPTOMS = {{ symptoms | tojson }};
+  let selected = new Set();
+  let predictionCount = 0;
+
+  // Render symptom tags
+  function renderSymptoms(filter = '') {
+    const grid = document.getElementById('symptomGrid');
+    const filtered = ALL_SYMPTOMS.filter(s =>
+      s.toLowerCase().replace(/_/g, ' ').includes(filter.toLowerCase())
+    );
+    grid.innerHTML = filtered.map(sym => `
+      <div class="symptom-tag ${selected.has(sym) ? 'active' : ''}"
+           onclick="toggleSymptom('${sym}')"
+           id="tag-${sym}">
+        <span class="dot"></span>
+        ${sym.replace(/_/g, ' ')}
+      </div>
+    `).join('');
+  }
+
+  // Toggle symptom selection
+  function toggleSymptom(sym) {
+    if (selected.has(sym)) {
+      selected.delete(sym);
+    } else {
+      selected.add(sym);
+    }
+    updateUI();
+    renderSymptoms(document.getElementById('searchInput').value);
+  }
+
+  // Update selected strip and button
+  function updateUI() {
+    const strip = document.getElementById('selectedStrip');
+    const count = selected.size;
+
+    document.getElementById('countBadge').textContent = `${count} selected`;
+    document.getElementById('statSymptoms').textContent = count;
+    document.getElementById('predictBtn').disabled = count < 2;
+
+    if (count === 0) {
+      strip.innerHTML = '<span class="empty-msg">No symptoms selected yet</span>';
+      return;
+    }
+
+    strip.innerHTML = [...selected].map(sym => `
+      <div class="sel-chip">
+        ${sym.replace(/_/g, ' ')}
+        <button onclick="toggleSymptom('${sym}')" title="Remove">×</button>
+      </div>
+    `).join('');
+  }
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', e => {
+    renderSymptoms(e.target.value);
+  });
+
+  // Predict
+  async function predict() {
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('predictionResult').classList.remove('show');
+    document.getElementById('errorMsg').classList.remove('show');
+    document.getElementById('loadingState').classList.add('show');
+
+    try {
+      const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms: [...selected] })
+      });
+
+      if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+
+      document.getElementById('loadingState').classList.remove('show');
+      showResult(data);
+      predictionCount++;
+      document.getElementById('statPredictions').textContent = predictionCount;
+
+    } catch (err) {
+      document.getElementById('loadingState').classList.remove('show');
+      document.getElementById('errorMsg').classList.add('show');
+    }
+  }
+
+  function showResult(data) {
+    document.getElementById('mainDisease').textContent = data.prediction;
+
+    const top3 = document.getElementById('top3List');
+    top3.innerHTML = data.top3.map((item, i) => `
+      <div class="top3-item">
+        <span class="rank">#${i + 1}</span>
+        <span class="name">${item.disease}</span>
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width: ${item.confidence}%"></div>
+        </div>
+        <span class="pct">${item.confidence}%</span>
+      </div>
+    `).join('');
+
+    document.getElementById('predictionResult').classList.add('show');
+  }
+
+  function resetSelection() {
+    selected.clear();
+    predictionCount = 0;
+
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statPredictions').textContent = predictionCount;
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('predictionResult').classList.remove('show');
+    document.getElementById('loadingState').classList.remove('show');
+    document.getElementById('errorMsg').classList.remove('show');
+
+    updateUI();
+    renderSymptoms();
+  }
+
+  // Init
+  renderSymptoms();
+</script>
+</body>
+</html>
